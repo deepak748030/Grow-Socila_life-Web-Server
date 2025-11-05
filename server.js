@@ -10,11 +10,11 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(helmet()); // Security headers
-app.use(compression()); // Compress responses
+// app.use(helmet()); // Security headers
+// app.use(compression()); // Compress responses
 app.use(cors({ origin: '*', credentials: true })); // Allow all origins
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('dev')); // Logging
 
 // Rate limiting
@@ -33,8 +33,8 @@ mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
 })
-.then(() => console.log('✅ MongoDB Connected Successfully'))
-.catch((err) => console.error('❌ MongoDB Connection Error:', err));
+  .then(() => console.log('✅ MongoDB Connected Successfully'))
+  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
 // Routes
 const authRoutes = require('./routes/auth');
