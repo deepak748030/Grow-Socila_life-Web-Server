@@ -12,8 +12,8 @@ const app = express();
 // Middleware
 // app.use(helmet()); // Security headers
 // app.use(compression()); // Compress responses
-app.use(cors({ origin: '*', credentials: true })); // Allow all origins
-app.use(express.json({ limit: '10mb' }));
+app.use(cors({ origin: '*' })); // Allow all origins
+app.use(express.json());
 // app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('dev')); // Logging
 
@@ -23,7 +23,7 @@ const limiter = rateLimit({
   max: 1000, // limit each IP to 1000 requests per windowMs
   message: 'Too many requests from this IP'
 });
-app.use('/api/', limiter);
+// app.use('/api/', limiter);
 
 // Database Connection with optimization
 mongoose.set('strictQuery', false);
