@@ -9,28 +9,9 @@ require('dotenv').config();
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
-
 // Middleware
-// app.use(helmet()); // Security headers
+app.use(helmet()); // Security headers
 app.use(compression()); // Compress responses
-const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // handle preflight
-
-app.use(express.json());
-// app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(morgan('dev')); // Logging
 
 // Rate limiting
 const limiter = rateLimit({
@@ -39,6 +20,26 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP'
 });
 // app.use('/api/', limiter);
+
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(morgan('dev')); // Logging
+
+
+// 👉 Add this here
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  // res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
 // Database Connection with optimization
 mongoose.set('strictQuery', false);
@@ -78,13 +79,13 @@ app.get('/health', (req, res) => {
 });
 
 // Error handling middleware
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(err.status || 500).json({
-//     error: err.message || 'Internal Server Error',
-//     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-//   });
-// });
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
 
 // 404 handler
 app.use((req, res) => {
